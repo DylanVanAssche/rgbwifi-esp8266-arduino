@@ -49,8 +49,8 @@
 #define RED_PIN D6
 #define BLUE_PIN D7
 
-const char *ssid = "WiFi-2.4-3aa4"; // Set here the SSID for your network
-const char *password = "7Jm2QwKxM67g"; // And the password
+const char *ssid = "XXX"; // Set here the SSID for your network
+const char *password = "XXX"; // And the password
 
 WiFiServer server(80);
 
