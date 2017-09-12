@@ -143,7 +143,7 @@ void setRGBA() {
     redValue = constrain(server.arg(0).toInt(), 0, 1024);
     greenValue = constrain(server.arg(1).toInt(), 0, 1024);
     blueValue = constrain(server.arg(2).toInt(), 0, 1024);
-    dimmerValue = constrain(server.arg(2).toInt(), 0, 100);
+    dimmerValue = constrain(server.arg(3).toInt(), 0, 100);
     analogWrite(RED_PIN, round(redValue*(dimmerValue/100.0)));
     analogWrite(GREEN_PIN, round(greenValue*(dimmerValue/100.0)));
     analogWrite(BLUE_PIN, round(blueValue*(dimmerValue/100.0)));
