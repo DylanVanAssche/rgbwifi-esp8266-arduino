@@ -9,7 +9,7 @@
    *                                        *
    *---------------> RGB-WIFI <-------------*
    *                                        *
-   *             V 2.0-0 RELEASE            *
+   *              V 1.2 RELEASE             *
    ******************************************
    THIS IS A RELEASE! I'm never resposibly for any damage to your stuff! This version is tested on a NodeMCU V1.0 ESP8266.
    Control your RGB ledstrip over a WiFi connection with your Sailfish OS smartphone and his app.
@@ -36,7 +36,7 @@
  >>> ENDPOINTS:
      ----------
  * /light          ->  returns the current color values
- * /light?red=value&green=value&blue=value  ->  updates the color values and returns them
+ * /light?red=value&green=value&blue=value&dimmer=value  ->  updates the color values and returns them
  
  
  >>> IMPORTANT NOTES: 
@@ -59,9 +59,10 @@ const char* password = "XXX";
 ESP8266WebServer server(80);
 StaticJsonBuffer<200> jsonBuffer;
 
-int redValue = 0;
-int greenValue = 0;
-int blueValue = 0;
+int redValue = 1024;
+int greenValue = 1024;
+int blueValue = 1024;
+int dimmerValue = 100;
  
 void setup(void) {
   
@@ -70,9 +71,9 @@ void setup(void) {
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
-  analogWrite(RED_PIN, redValue);
-  analogWrite(GREEN_PIN, greenValue);
-  analogWrite(BLUE_PIN, blueValue);
+  analogWrite(RED_PIN, round(redValue*(dimmerValue/100.0)));
+  analogWrite(GREEN_PIN, round(greenValue*(dimmerValue/100.0)));
+  analogWrite(BLUE_PIN, round(blueValue*(dimmerValue/100.0)));
 
   // ONBOARD status LED
   digitalWrite(LED_PIN, LOW);
@@ -128,7 +129,8 @@ void setRGBA() {
     json["red"] = redValue;
     json["green"] = greenValue;
     json["blue"] = blueValue;
-
+    json["dimmer"] = dimmerValue;
+    
     // Reply to client
     String reply;
     json.printTo(reply);
@@ -136,14 +138,15 @@ void setRGBA() {
   }
   
   // Update the color values (limit them if necessary) and return them
-  else if(server.args() == 3) {
+  else if(server.args() == 4) {
     // Update the color values
     redValue = constrain(server.arg(0).toInt(), 0, 1024);
     greenValue = constrain(server.arg(1).toInt(), 0, 1024);
     blueValue = constrain(server.arg(2).toInt(), 0, 1024);
-    analogWrite(RED_PIN, redValue);
-    analogWrite(GREEN_PIN, greenValue);
-    analogWrite(BLUE_PIN, blueValue);
+    dimmerValue = constrain(server.arg(2).toInt(), 0, 100);
+    analogWrite(RED_PIN, round(redValue*(dimmerValue/100.0)));
+    analogWrite(GREEN_PIN, round(greenValue*(dimmerValue/100.0)));
+    analogWrite(BLUE_PIN, round(blueValue*(dimmerValue/100.0)));
 
     // Build JSON reply
     jsonBuffer.clear();
@@ -152,6 +155,7 @@ void setRGBA() {
     json["red"] = redValue;
     json["green"] = greenValue;
     json["blue"] = blueValue;
+    json["dimmer"] = dimmerValue;
 
     // Reply to client
     String reply;
